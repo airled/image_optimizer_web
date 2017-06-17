@@ -1,7 +1,7 @@
 require 'fileutils'
 
 task :prepare do
-  Dir.mkdir('./public/downloads')
+  system('mkdir ./public/downloads && touch ./public/downloads/.keep')
 end
 
 task :run do

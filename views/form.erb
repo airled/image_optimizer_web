@@ -6,22 +6,30 @@
 <body>
 	<div class="col-md-5">
 		<form id="file_upload_form" action="/upload" method="post" enctype="multipart/form-data">
-			<div class="form-group">
-				<label for="quality">Качество</label>
-				<input class="form-control" id="quality" type="number" name="quality" min="1" max="100" value="80">
+			<div class="row">
+				<div class="col-md-6 form-group">
+					<label for="quality">Качество</label>
+					<input class="form-control" id="quality" type="number" name="quality" min="1" max="100" value="80">
+				</div>
+				<div class="col-md-6 form-group">
+					<label for="file_select">Выбор файлов</label>
+					<input class="form-control" id="file_select" type="file" name="images[]" multiple>
+				</div>
 			</div>
 			<div class="form-group">
-				<label for="file_select">Выбор файлов</label>
-				<input class="form-control" id="file_select" type="file" name="images[]" multiple>
+				<label for="file_select">Общий размер (не более 25 MB):</label>
+				<span id="sum-file-size">0 kB</span>
 			</div>
-			<input class="btn btn-primary form-control" type="submit" value="Сжать">
+			<div class="progress" id="progress">
+				<div id="progressbar" class="progress-bar progress-bar-warning" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+				</div>
+			</div>
 		</form>
-		<div class="progress" id="progress">
-			<div id="progressbar" class="progress-bar progress-bar-warning" role="progressbar" aria-valuemin="0" aria-valuemax="100">
-			</div>
-		</div>
+		<button id="upload-button" class="btn btn-primary form-control">Сжать</button>
+		<button id="cancel-button" class="btn btn-danger form-control hidden">Остановить</button>
+		<p></p>
 		<div id="status" class="status"></div>
 	</div>
-<script type="application/javascript" src="script.js"></script>
+	<script type="application/javascript" src="script.js"></script>
 </body>
 </html>
