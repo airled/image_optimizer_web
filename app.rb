@@ -13,15 +13,16 @@ end
 
 post '/upload' do
   dirname = "#{Time.now.to_i}-#{SecureRandom.hex}"
-  Dir.mkdir("./tmp/#{dirname}")
+  Dir.mkdir("./public/downloads/#{dirname}")
   params[:images].each do |file_param|
     next unless Helpers::Determiner.image?(file_param[:filename])
-    File.open("./tmp/#{dirname}/#{file_param[:filename]}", 'wb') do |file|
+    File.open("./public/downloads/#{dirname}/#{file_param[:filename]}", 'wb') do |file|
       file << File.read(file_param[:tempfile])
     end
   end
   quality = params[:quality].nil? ? 80 : params[:quality].to_i
-  Helpers::Optimizer.new(quality).optimize_all_in_dir("./tmp/#{dirname}")
-  Helpers::Packer.new.pack_all_in_dir("./tmp/#{dirname}")
-  send_file "./tmp/#{dirname}/optimized.zip"
+  Helpers::Optimizer.new(quality).optimize_all_in_dir("./public/downloads/#{dirname}")
+  Helpers::Packer.new.pack_all_in_dir("./public/downloads/#{dirname}")
+  Helpers::Cleaner.new.clean_dir("./public/downloads/#{dirname}")
+  body "http://#{request.env['HTTP_HOST']}/downloads/#{dirname}/optimized.zip"
 end

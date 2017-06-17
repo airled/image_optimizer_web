@@ -31,4 +31,14 @@ module Helpers
     end
   end
 
+  class Cleaner
+    def clean_dir(dir_path)
+      entries = Dir.entries(dir_path).reject! { |x| x == '.' || x == '..' || x.include?('zip') }
+      entries.each do |entry|
+        full_path = dir_path + '/' + entry
+        File.delete(full_path)
+      end
+    end
+  end
+
 end
