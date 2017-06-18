@@ -8,6 +8,18 @@ module Helpers
     end
   end
 
+  class Carrier
+    def save(dirname, params)
+      Dir.mkdir("./public/downloads/#{dirname}")
+      params[:images].each do |file_param|
+        next unless Determiner.image?(file_param[:filename])
+        File.open("./public/downloads/#{dirname}/#{file_param[:filename]}", 'wb') do |file|
+          file << File.read(file_param[:tempfile])
+        end
+      end
+    end
+  end
+
   class Optimizer
     def initialize(quality = 80)
       @quality = quality

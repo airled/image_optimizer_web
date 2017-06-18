@@ -66,7 +66,6 @@ function upload() {
   xhr.send(formData);
 
   function cancel(e) {
-    console.log('1')
     xhr.abort();
     cancelButton.classList.add('hidden');
     uploadButton.classList.remove('hidden');
