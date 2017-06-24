@@ -8,11 +8,10 @@ require_relative './helpers/helpers'
 helpers Helpers
 
 get '/' do
-  erb :form
+  slim :form
 end
 
 post '/upload' do
-  p params
   dirname = "#{Time.now.to_i}-#{SecureRandom.hex}"
   Helpers::Carrier.new(params).save(dirname)
   Helpers::Optimizer.new(params).optimize_all_in_dir(dirname)

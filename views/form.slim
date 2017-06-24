@@ -1,0 +1,42 @@
+html
+  head
+    link href="styles.css" rel="stylesheet" /
+    link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" /
+  body
+    .wrapper
+      form#file_upload_form action="/upload" enctype="multipart/form-data" method="post" 
+        .row
+          .col-md-6.form-group
+            label for="file_select"  Выбор файлов
+            input#file_select.form-control multiple="" name="images[]" type="file" /
+          .col-md-6.form-group
+            label for="quality"  Качество JPG
+            input#quality.form-control max="100" min="1" name="quality" type="number" value="80" /
+        .row
+          .col-md-6
+            .radio
+              label
+                input#change-size-no checked="checked" name="resize" type="radio" value="no" /
+                | Не менять размер
+            .radio
+              label
+                input#change-size-fit name="resize" type="radio" value="fit" /
+                | Вместить
+            .radio
+              label
+                input#change-size-fill name="resize" type="radio" value="fill" /
+                | Заполнить
+          .col-md-6.form-group
+            label for="resize-width"  Ширина
+            input#resize-width.form-control name="width" placeholder="Ширина" type="number" /
+            label for="resize-height"  Высота
+            input#resize-height.form-control name="height" placeholder="Высота" type="number" /
+        .form-group
+          label for="file_select"  Общий размер (не более 25 MB):
+          span#sum-file-size 0 kB
+      button#upload-button.btn.btn-primary.form-control Сжать
+      button#cancel-button.btn.btn-danger.form-control.hidden Остановить
+      form#download-zip.hidden action="/get_zip" method="post" 
+        input#imageLinksInput name="links" type="hidden" value="" /
+        input.btn.btn-success.form-control type="submit" value=("Скачать архивом") /
+    script src="script.js" type="application/javascript" 
