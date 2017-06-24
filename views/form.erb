@@ -4,35 +4,59 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 </head>
 <body>
-	<div class="row">
-		<div class="col-md-4"></div>
-		<div class="col-md-4">
-			<form id="file_upload_form" action="/upload" method="post" enctype="multipart/form-data">
-				<div class="row">
-					<div class="col-md-6 form-group">
-						<label for="quality">Качество</label>
-						<input class="form-control" id="quality" type="number" name="quality" min="1" max="100" value="80">
+	<div class="wrapper">
+		<form id="file_upload_form" action="/upload" method="post" enctype="multipart/form-data">
+			<div class="row">
+				<div class="col-md-6 form-group">
+					<label for="file_select">Выбор файлов</label>
+					<input class="form-control" id="file_select" type="file" name="images[]" multiple>
+				</div>
+				<div class="col-md-6 form-group">
+					<label for="quality">Качество JPG</label>
+					<input class="form-control" id="quality" type="number" name="quality" min="1" max="100" value="80">
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6">
+					<div class="radio">
+						<label>
+							<input id="change-size-no" type="radio" name="resize" value="no" checked="checked">
+							Не менять размер
+						</label>
 					</div>
-					<div class="col-md-6 form-group">
-						<label for="file_select">Выбор файлов</label>
-						<input class="form-control" id="file_select" type="file" name="images[]" multiple>
+					<div class="radio">
+						<label>
+							<input id="change-size-fit" type="radio" name="resize" value="fit">
+							Вместить
+						</label>
+					</div>
+					<div class="radio">
+						<label>
+							<input id="change-size-fill" type="radio" name="resize" value="fill">
+							Заполнить
+						</label>
 					</div>
 				</div>
-				<div class="form-group">
-					<label for="file_select">Общий размер (не более 25 MB):</label>
-					<span id="sum-file-size">0 kB</span>
+				<div class="col-md-6 form-group">
+					<label for="resize-width">Ширина</label>
+					<input id="resize-width" class="form-control" type="number" name="width" placeholder="Ширина">
+					<label for="resize-height">Высота</label>
+					<input id="resize-height" class="form-control" type="number" name="height" placeholder="Высота">
 				</div>
-				<div class="progress" id="progress">
-					<div id="progressbar" class="progress-bar progress-bar-warning" role="progressbar" aria-valuemin="0" aria-valuemax="100">
-					</div>
+			</div>
+			<div class="form-group">
+				<label for="file_select">Общий размер (не более 25 MB):</label>
+				<span id="sum-file-size">0 kB</span>
+			</div>
+			<div class="progress" id="progress">
+				<div id="progressbar" class="progress-bar progress-bar-warning" role="progressbar" aria-valuemin="0" aria-valuemax="100">
 				</div>
-			</form>
-			<button id="upload-button" class="btn btn-primary form-control">Сжать</button>
-			<button id="cancel-button" class="btn btn-danger form-control hidden">Остановить</button>
-			<p></p>
-			<div id="status" class="status"></div>
-		</div>
-		<div class="col-md-4"></div>
+			</div>
+		</form>
+		<button id="upload-button" class="btn btn-primary form-control">Сжать</button>
+		<button id="cancel-button" class="btn btn-danger form-control hidden">Остановить</button>
+		<p></p>
+		<div id="status" class="status"></div>
 	</div>
 	<script type="application/javascript" src="script.js"></script>
 </body>

@@ -81,6 +81,11 @@ function upload() {
   cancelButton.classList.remove('hidden');
 }
 
+function clearWidthAndHeight() {
+  document.getElementById('resize-width').value = '';
+  document.getElementById('resize-height').value = '';
+}
+
 window.onload = function() {
   document.getElementById('file_select').addEventListener('change', function(event) {
     var totalSize = calculateTotalFileSize();
@@ -91,4 +96,8 @@ window.onload = function() {
     event.preventDefault();
     upload();
   }, false);
+
+  document.getElementById('change-size-no').addEventListener('click', function() {
+    clearWidthAndHeight();
+  });
 }

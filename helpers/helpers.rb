@@ -23,14 +23,38 @@ module Helpers
   end
 
   class Optimizer
-    def initialize(quality = 80)
-      @quality = quality
+    def initialize(params)
+      @quality = params[:quality].to_s.empty? ? 80 : params[:quality].to_i
+      @width = params[:width].to_s.strip
+      @height = params[:height].to_s.strip
+      @resize = params[:resize]
     end
 
     def optimize_all_in_dir(dir_name)
       Dir.entries("#{KEEP_FOLDER_PATH}/#{dir_name}").each do |entry|
         next if ['.', '..'].include?(entry)
         full_path = "#{KEEP_FOLDER_PATH}/#{dir_name}/#{entry}"
+        case @resize
+        when 'fit'
+          image = MiniMagick::Image.new(full_path)
+          unless (@width == '' && @height == '') || (@width == image.width.to_s && @height == image.height.to_s)
+            new_width = @width.empty? ? image.width : @width
+            new_height = @height.empty? ? image.height : @height
+            MiniMagick::Image.new(full_path).resize("#{new_width}x#{new_height}")
+          end
+        when 'fill'
+          image = MiniMagick::Image.new(full_path)
+          unless (@width == '' && @height == '') || (@width == image.width.to_s && @height == image.height.to_s)
+            scale_x = @width.to_i / image.width.to_f
+            scale_y = @height.to_i / image.height.to_f
+            if scale_x > scale_y
+              image.resize("#{scale_x * image.width}")
+            else
+              image.resize("x#{scale_y * image.height}")
+            end
+            image.crop("#{@width}x#{@height}+0+0")
+          end
+        end
         ImageOptimizer.new(full_path, quality: @quality).optimize if Determiner.image?(full_path)
       end
     end
