@@ -15,8 +15,8 @@ post '/upload' do
   dirname = "#{Time.now.to_i}-#{SecureRandom.hex}"
   Helpers::Carrier.new.save(dirname, params)
   quality = params[:quality].nil? ? 80 : params[:quality].to_i
-  Helpers::Optimizer.new(quality).optimize_all_in_dir("./public/downloads/#{dirname}")
-  Helpers::Packer.new.pack_all_in_dir("./public/downloads/#{dirname}")
-  Helpers::Cleaner.new.clean_dir("./public/downloads/#{dirname}")
+  Helpers::Optimizer.new(quality).optimize_all_in_dir(dirname)
+  Helpers::Packer.new.pack_all_in_dir(dirname)
+  Helpers::Cleaner.new.clean_dir(dirname)
   body "http://#{request.env['HTTP_HOST']}/downloads/#{dirname}/optimized.zip"
 end

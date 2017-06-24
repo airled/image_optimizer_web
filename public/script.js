@@ -42,6 +42,8 @@ function upload() {
     if (xhr.status === 200) {
       uploadButton.classList.remove('hidden');
       cancelButton.classList.add('hidden');
+      progressbar.classList.remove('progress-bar-striped');
+      progressbar.classList.remove('active');
       statusbar.innerHTML = '<a class="btn btn-success" href= ' + xhr.responseText + ' style="width: 100%;">Скачать архив</a>';
     } else {
       statusbar.innerHTML = 'Ошибка';
@@ -58,6 +60,8 @@ function upload() {
   xhr.upload.onload = function() {
     progressbar.classList.remove('progress-bar-warning');
     progressbar.classList.add('progress-bar-success');
+    progressbar.classList.add('progress-bar-striped');
+    progressbar.classList.add('active');
     statusbar.innerHTML = 'Загружено. Обработка...';
   }
   xhr.upload.onerror = function() {
