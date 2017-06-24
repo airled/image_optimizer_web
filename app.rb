@@ -12,10 +12,16 @@ get '/' do
 end
 
 post '/upload' do
+  p params
   dirname = "#{Time.now.to_i}-#{SecureRandom.hex}"
-  Helpers::Carrier.new.save(dirname, params)
+  Helpers::Carrier.new(params).save(dirname)
   Helpers::Optimizer.new(params).optimize_all_in_dir(dirname)
-  Helpers::Packer.new.pack_all_in_dir(dirname)
-  Helpers::Cleaner.new.clean_dir(dirname)
-  body "http://#{request.env['HTTP_HOST']}/downloads/#{dirname}/optimized.zip"
+  body "/downloads/#{dirname}/#{params[:file][:filename]}"
+end
+
+post '/get_zip' do
+  halt 400 if params[:links].nil? || params[:links].to_s.strip.empty?
+  links = JSON.parse(params[:links])
+  zip = Helpers::Packer.new.pack(links)
+  send_file zip
 end

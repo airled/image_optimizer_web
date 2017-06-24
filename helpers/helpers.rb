@@ -11,13 +11,15 @@ module Helpers
   end
 
   class Carrier
-    def save(dir_name, params)
+    def initialize(params)
+      @file_name = params[:file][:filename]
+      @temp_file = params[:file][:tempfile]
+    end
+
+    def save(dir_name)
       Dir.mkdir("#{KEEP_FOLDER_PATH}/#{dir_name}")
-      params[:images].each do |file_param|
-        next unless Determiner.image?(file_param[:filename])
-        File.open("#{KEEP_FOLDER_PATH}/#{dir_name}/#{file_param[:filename]}", 'wb') do |file|
-          file << File.read(file_param[:tempfile])
-        end
+      File.open("#{KEEP_FOLDER_PATH}/#{dir_name}/#{@file_name}", 'wb') do |file|
+        file << File.read(@temp_file)
       end
     end
   end
@@ -47,11 +49,8 @@ module Helpers
           unless (@width == '' && @height == '') || (@width == image.width.to_s && @height == image.height.to_s)
             scale_x = @width.to_i / image.width.to_f
             scale_y = @height.to_i / image.height.to_f
-            if scale_x > scale_y
-              image.resize("#{scale_x * image.width}")
-            else
-              image.resize("x#{scale_y * image.height}")
-            end
+            resizing = scale_x > scale_y ? "#{scale_x * image.width}" : "x#{scale_y * image.height}"
+            image.resize(resizing)
             image.crop("#{@width}x#{@height}+0+0")
           end
         end
@@ -61,22 +60,16 @@ module Helpers
   end
 
   class Packer
-    def pack_all_in_dir(dir_name)
-      Zip::File.open("#{KEEP_FOLDER_PATH}/#{dir_name}/optimized.zip", Zip::File::CREATE) do |zipfile|
-        Dir.entries("#{KEEP_FOLDER_PATH}/#{dir_name}").each do |entry|
-          next if ['.', '..'].include?(entry)
-          zipfile.add(entry, "#{KEEP_FOLDER_PATH}/#{dir_name}/#{entry}")
+    def pack(links)
+      zip_path = "#{KEEP_FOLDER_PATH}/#{SecureRandom.hex}.zip"
+      Zip::File.open(zip_path, Zip::File::CREATE) do |zipfile|
+        links.each do |link|
+          image_path = link.gsub('/downloads/', '')
+          image_name = image_path.split('/').last
+          zipfile.add(image_name, "#{KEEP_FOLDER_PATH}/#{image_path}")
         end
       end
-    end
-  end
-
-  class Cleaner
-    def clean_dir(dir_name)
-      Dir.entries("#{KEEP_FOLDER_PATH}/#{dir_name}").each do |entry|
-        next if entry == '.' || entry == '..' || entry.include?('.zip')
-        File.delete("#{KEEP_FOLDER_PATH}/#{dir_name}/#{entry}")
-      end
+      zip_path
     end
   end
 

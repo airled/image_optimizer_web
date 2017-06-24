@@ -48,15 +48,13 @@
 				<label for="file_select">Общий размер (не более 25 MB):</label>
 				<span id="sum-file-size">0 kB</span>
 			</div>
-			<div class="progress" id="progress">
-				<div id="progressbar" class="progress-bar progress-bar-warning" role="progressbar" aria-valuemin="0" aria-valuemax="100">
-				</div>
-			</div>
 		</form>
 		<button id="upload-button" class="btn btn-primary form-control">Сжать</button>
 		<button id="cancel-button" class="btn btn-danger form-control hidden">Остановить</button>
-		<p></p>
-		<div id="status" class="status"></div>
+		<form class="hidden" id="download-zip" action="/get_zip" method="post">
+			<input id="imageLinksInput" type="hidden" name="links" value="">
+			<input class="btn btn-success form-control" type="submit" value="Скачать архивом">
+		</form>
 	</div>
 	<script type="application/javascript" src="script.js"></script>
 </body>

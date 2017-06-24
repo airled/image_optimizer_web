@@ -1,3 +1,6 @@
+var activeAjaxes = 0;
+var imageLinks = [];
+
 function calculateTotalFileSize() {
   var files = document.getElementById('file_select').files;
   var totalSize = 0;
@@ -29,56 +32,78 @@ function normalizeSize(byteSize) {
   return size + ' kB';
 }
 
-function upload() {
-  var progressbar = document.getElementById('progressbar');
-  var statusbar = document.getElementById('status');
-  var uploadButton = document.getElementById('upload-button');
-  var cancelButton = document.getElementById('cancel-button');
-  var formData = new FormData(document.getElementById('file_upload_form'));
-  progressbar.classList.add('progress-bar-warning');
+function sendFile(file, number, imageParams) {
+  var formData = new FormData();
+  formData.append('file', file, file.name);
+  Object.keys(imageParams).forEach(function(key) {
+    formData.append(key, imageParams[key]);
+  });
   var xhr = new XMLHttpRequest();
   xhr.open('POST', '/upload', true);
-  xhr.onload = function() {
-    if (xhr.status === 200) {
-      uploadButton.classList.remove('hidden');
-      cancelButton.classList.add('hidden');
-      progressbar.classList.remove('progress-bar-striped');
-      progressbar.classList.remove('active');
-      statusbar.innerHTML = '<a class="btn btn-success" href= ' + xhr.responseText + ' style="width: 100%;">Скачать архив</a>';
-    } else {
-      statusbar.innerHTML = 'Ошибка';
-    }
-  }
+  var progressBarCode = '<div class="row"><div class="col-md-6"><div class="progress"><div id="progress-bar-' + number + '" class="progress-bar progress-bar-warning" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div></div></div><div id="status-bar-' + number + '" class="col-md-6"></div></div>'
+  document.getElementById('file_upload_form').insertAdjacentHTML('beforeend', progressBarCode);
+  var progressbar = document.getElementById('progress-bar-' + number);
+  var statusbar = document.getElementById('status-bar-' + number);
   xhr.upload.onprogress = function(event) {
     var loadedKb = Math.floor(event.loaded / 1000);
     var totalKb = Math.floor(event.total / 1000);
     var percentage = Math.floor((loadedKb / totalKb) * 100);
     progressbar.style.width = percentage + '%';
     progressbar.innerText = percentage + '%';
-    statusbar.innerText = loadedKb + '/' + totalKb;
+    statusbar.innerHTML = file.name + ' | ' + loadedKb + '/' + totalKb;
+  }
+  xhr.upload.onerror = function() {
+    progressbar.innerHTML = 'Ошибка';
   }
   xhr.upload.onload = function() {
     progressbar.classList.remove('progress-bar-warning');
-    progressbar.classList.add('progress-bar-success');
-    progressbar.classList.add('progress-bar-striped');
-    progressbar.classList.add('active');
-    statusbar.innerHTML = 'Загружено. Обработка...';
+    progressbar.classList.add('progress-bar-primary', 'progress-bar-striped', 'active');
+    progressbar.innerHTML = 'Загружено. Обработка...';
   }
-  xhr.upload.onerror = function() {
-    statusbar.innerHTML = 'Ошибка';
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      progressbar.classList.remove('progress-bar-primary', 'progress-bar-striped', 'active');
+      progressbar.classList.add('progress-bar-success');
+      progressbar.innerHTML = '<a target="_blank" href= ' + xhr.responseText + ' style="width: 100%; color: white;">Скачать</a>';
+      activeAjaxes--;
+      imageLinks.push(xhr.responseText);
+      if (activeAjaxes == 0) {
+        document.getElementById('imageLinksInput').value = JSON.stringify(imageLinks);
+        document.getElementById('download-zip').classList.remove('hidden');
+      }
+    } else {
+      progressbar.innerHTML = 'Ошибка';
+    }
   }
   xhr.send(formData);
+}
 
-  function cancel(e) {
-    xhr.abort();
-    cancelButton.classList.add('hidden');
-    uploadButton.classList.remove('hidden');
-    e.target.removeEventListener(e.type, arguments.callee);
-    statusbar.innerHTML = 'Остановлено';
+function determineResizeType() {
+  var resize = '';
+  var inputs = document.getElementsByTagName('input');
+  var inputCounter = 0;
+  while (resize === '' && inputCounter < inputs.length) {
+    if (inputs[inputCounter].type === 'radio' && inputs[inputCounter].checked) {
+      resize = inputs[inputCounter].value;
+    }
+    inputCounter++;
   }
-  cancelButton.addEventListener('click', cancel);
-  uploadButton.classList.add('hidden');
-  cancelButton.classList.remove('hidden');
+  return resize;
+}
+
+function upload() {
+  var files = document.getElementById('file_select').files;
+  var imageHandleParams = {
+    quality: document.getElementById('quality').value,
+    resize:  determineResizeType(),
+    width:   document.getElementById('resize-width').value,
+    height:  document.getElementById('resize-height').value
+  }
+  for (var i = 0; i < files.length; ++i) {
+    document.getElementById('upload-button').classList.add('hidden');
+    sendFile(files[i], i, imageHandleParams);
+    activeAjaxes++;
+  }
 }
 
 function clearWidthAndHeight() {
@@ -99,5 +124,5 @@ window.onload = function() {
 
   document.getElementById('change-size-no').addEventListener('click', function() {
     clearWidthAndHeight();
-  });
+  }, false);
 }
