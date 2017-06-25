@@ -1,5 +1,7 @@
 var activeAjaxes = 0;
 var imageLinks = [];
+var ajaxQueue = [];
+var ajaxQueueStep = 1;
 
 function calculateTotalFileSize() {
   var files = document.getElementById('file_select').files;
@@ -40,8 +42,6 @@ function sendFile(file, number, imageParams) {
   });
   var xhr = new XMLHttpRequest();
   xhr.open('POST', '/upload', true);
-  var progressBarCode = '<div class="row"><div class="col-md-6"><div class="progress"><div id="progress-bar-' + number + '" class="progress-bar progress-bar-warning" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div></div></div><div id="status-bar-' + number + '" class="col-md-6"></div></div>'
-  document.getElementById('file_upload_form').insertAdjacentHTML('beforeend', progressBarCode);
   var progressbar = document.getElementById('progress-bar-' + number);
   var statusbar = document.getElementById('status-bar-' + number);
   xhr.upload.onprogress = function(event) {
@@ -72,8 +72,11 @@ function sendFile(file, number, imageParams) {
         document.getElementById('download-zip').classList.remove('hidden');
       }
     } else {
+      progressbar.classList.remove('progress-bar-primary', 'progress-bar-striped', 'active');
+      progressbar.classList.add('progress-bar-danger');
       progressbar.innerHTML = 'Ошибка';
     }
+    runNextFromAjaxQueue();
   }
   xhr.send(formData);
 }
@@ -91,7 +94,16 @@ function determineResizeType() {
   return resize;
 }
 
-function upload() {
+function runNextFromAjaxQueue() {
+  for (var i = 0; i < ajaxQueueStep; ++i) {
+    if (ajaxQueue.length !== 0) {
+      nextFile = ajaxQueue.shift();
+      sendFile(nextFile.file, nextFile.position, nextFile.params);    
+    }
+  }
+}
+
+function startUpload() {
   var files = document.getElementById('file_select').files;
   var imageHandleParams = {
     quality: document.getElementById('quality').value,
@@ -100,10 +112,12 @@ function upload() {
     height:  document.getElementById('resize-height').value
   }
   for (var i = 0; i < files.length; ++i) {
-    document.getElementById('upload-button').classList.add('hidden');
-    sendFile(files[i], i, imageHandleParams);
     activeAjaxes++;
+    var progressBarCode = '<div class="row"><div class="col-md-6"><div class="progress"><div id="progress-bar-' + i + '" class="progress-bar progress-bar-warning" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div></div></div><div id="status-bar-' + i + '" class="col-md-6">Ожидание очереди...</div></div>'
+    document.getElementById('file_upload_form').insertAdjacentHTML('beforeend', progressBarCode);
+    ajaxQueue.push({file: files[i], position: i, params: imageHandleParams});
   }
+  runNextFromAjaxQueue();
 }
 
 function clearWidthAndHeight() {
@@ -119,7 +133,8 @@ window.onload = function() {
 
   document.getElementById('upload-button').addEventListener('click', function(event) {
     event.preventDefault();
-    upload();
+    document.getElementById('upload-button').classList.add('hidden');
+    startUpload();
   }, false);
 
   document.getElementById('change-size-no').addEventListener('click', function() {

@@ -5,6 +5,8 @@ require 'securerandom'
 require 'fileutils'
 require_relative './helpers/helpers'
 
+set :server, :puma
+
 helpers Helpers
 
 get '/' do
@@ -12,6 +14,7 @@ get '/' do
 end
 
 post '/upload' do
+  halt 400 unless Helpers::Determiner.image?(params[:file][:filename], params[:file][:tempfile])
   dirname = "#{Time.now.to_i}-#{SecureRandom.hex}"
   Helpers::Carrier.new(params).save(dirname)
   Helpers::Optimizer.new(params).optimize_all_in_dir(dirname)

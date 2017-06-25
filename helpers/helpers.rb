@@ -3,10 +3,14 @@ require 'zip'
 module Helpers
 
   KEEP_FOLDER_PATH = File.expand_path('../../public/downloads/', __FILE__).freeze
+  JPG_SIGNATURE = [255, 216, 255]
+  PNG_SIGNATURE = [137, 80, 78]
 
   class Determiner
-    def self.image?(name)
-      name.split('.').last.match(/jpe?g|png/i)
+    def self.image?(filename, file)
+      first_three_bytes = IO.read(file, 3).bytes
+      (first_three_bytes == JPG_SIGNATURE && filename.match(/.+\.jpe?g\z/i)) ||
+      (first_three_bytes == PNG_SIGNATURE && filename.match(/.+\.png\z/i))
     end
   end
 
@@ -54,7 +58,7 @@ module Helpers
             image.crop("#{@width}x#{@height}+0+0")
           end
         end
-        ImageOptimizer.new(full_path, quality: @quality).optimize if Determiner.image?(full_path)
+        ImageOptimizer.new(full_path, quality: @quality, quiet: true, level: 3).optimize
       end
     end
   end
