@@ -14,8 +14,8 @@ get '/' do
 end
 
 post '/upload' do
-  halt 400 unless Helpers::Determiner.image?(params[:file][:filename], params[:file][:tempfile])
-  dirname = "#{Time.now.to_i}-#{SecureRandom.hex}"
+  halt 400 unless Helpers::Determiner.image?(params)
+  dirname = "#{Time.now.to_i}-#{SecureRandom.uuid}"
   Helpers::Carrier.new(params).save(dirname)
   Helpers::Optimizer.new(params).optimize_all_in_dir(dirname)
   body "/downloads/#{dirname}/#{params[:file][:filename]}"

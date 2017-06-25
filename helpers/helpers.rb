@@ -7,10 +7,11 @@ module Helpers
   PNG_SIGNATURE = [137, 80, 78]
 
   class Determiner
-    def self.image?(filename, file)
-      first_three_bytes = IO.read(file, 3).bytes
-      (first_three_bytes == JPG_SIGNATURE && filename.match(/.+\.jpe?g\z/i)) ||
-      (first_three_bytes == PNG_SIGNATURE && filename.match(/.+\.png\z/i))
+    def self.image?(params)
+      return false if params[:file].to_s.strip.empty?
+      first_three_bytes = IO.read(params[:file][:tempfile], 3).bytes
+      (first_three_bytes == JPG_SIGNATURE && params[:file][:filename].match(/.+\.jpe?g\z/i)) ||
+      (first_three_bytes == PNG_SIGNATURE && params[:file][:filename].match(/.+\.png\z/i))
     end
   end
 
