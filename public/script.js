@@ -62,11 +62,12 @@ function sendFile(file, number, imageParams) {
   }
   xhr.onload = function() {
     if (xhr.status === 200) {
+      response = JSON.parse(xhr.responseText);
       progressbar.classList.remove('progress-bar-primary', 'progress-bar-striped', 'active');
       progressbar.classList.add('progress-bar-success');
-      progressbar.innerHTML = '<a target="_blank" href= ' + xhr.responseText + ' style="width: 100%; color: white;">Скачать</a>';
+      progressbar.innerHTML = '<a target="_blank" href= ' + response.link + ' style="width: 100%; color: white;">Скачать (' + response.diff + '%)' + '</a>';
       activeAjaxes--;
-      imageLinks.push(xhr.responseText);
+      imageLinks.push(response.link);
       if (activeAjaxes == 0) {
         document.getElementById('imageLinksInput').value = JSON.stringify(imageLinks);
         document.getElementById('download-zip').classList.remove('hidden');

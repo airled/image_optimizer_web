@@ -7,3 +7,7 @@ gem 'rubyzip'
 gem 'rake'
 gem 'slim'
 gem 'puma'
+
+group :development do
+  gem 'byebug'
+end

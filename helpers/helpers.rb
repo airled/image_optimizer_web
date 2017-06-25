@@ -1,17 +1,19 @@
 require 'zip'
+require 'mini_magick'
+require 'image_optimizer'
+require 'byebug'
 
 module Helpers
-
   KEEP_FOLDER_PATH = File.expand_path('../../public/downloads/', __FILE__).freeze
   JPG_SIGNATURE = [255, 216, 255]
   PNG_SIGNATURE = [137, 80, 78]
 
   class Determiner
     def self.image?(params)
-      return false if params[:file].to_s.strip.empty?
-      first_three_bytes = IO.read(params[:file][:tempfile], 3).bytes
-      (first_three_bytes == JPG_SIGNATURE && params[:file][:filename].match(/.+\.jpe?g\z/i)) ||
-      (first_three_bytes == PNG_SIGNATURE && params[:file][:filename].match(/.+\.png\z/i))
+      return false unless params.dig(:file, :tempfile)
+      signature = params[:file][:tempfile].read(3).bytes
+      (signature == JPG_SIGNATURE && params[:file][:filename].match(/.+\.jpe?g\z/i)) ||
+      (signature == PNG_SIGNATURE && params[:file][:filename].match(/.+\.png\z/i))
     end
   end
 
@@ -64,18 +66,28 @@ module Helpers
     end
   end
 
-  class Packer
-    def pack(links)
+  class Ziper
+    def zip_from(links)
       zip_path = "#{KEEP_FOLDER_PATH}/#{SecureRandom.hex}.zip"
       Zip::File.open(zip_path, Zip::File::CREATE) do |zipfile|
         links.each do |link|
           image_path = link.gsub('/downloads/', '')
-          image_name = image_path.split('/').last
-          zipfile.add(image_name, "#{KEEP_FOLDER_PATH}/#{image_path}")
+          zipfile.add(image_path.split('/').last, "#{KEEP_FOLDER_PATH}/#{image_path}")
         end
       end
       zip_path
     end
   end
 
+  class Comparator
+    def initialize(params)
+      @filename = params[:file][:filename]
+      @old_file_size = params[:file][:tempfile].size
+    end
+
+    def compare(dirname)
+      new_file_size = File.size("#{KEEP_FOLDER_PATH}/#{dirname}/#{@filename}")
+      (new_file_size - @old_file_size) * 100 / @old_file_size
+    end
+  end
 end
