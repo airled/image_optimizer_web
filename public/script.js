@@ -3,6 +3,18 @@ var imageLinks = [];
 var ajaxQueue = [];
 var ajaxQueueStep = 1;
 
+function disableAllInputs() {
+  document.querySelectorAll('input').forEach(function(elem) {
+    elem.setAttribute('disabled', 'disabled');
+  });
+}
+
+function enableAllInputs() {
+  document.querySelectorAll('input').forEach(function(elem) {
+    elem.removeAttribute('disabled', 'disabled');
+  });
+}
+
 function calculateTotalFileSize() {
   var files = document.getElementById('file_select').files;
   var totalSize = 0;
@@ -71,6 +83,7 @@ function sendFile(file, number, imageParams) {
       if (activeAjaxes == 0) {
         document.getElementById('imageLinksInput').value = JSON.stringify(imageLinks);
         document.getElementById('download-zip').classList.remove('hidden');
+        enableAllInputs();
       }
     } else {
       progressbar.classList.remove('progress-bar-primary', 'progress-bar-striped', 'active');
@@ -114,7 +127,7 @@ function startUpload() {
   }
   for (var i = 0; i < files.length; ++i) {
     activeAjaxes++;
-    var progressBarCode = '<div class="row"><div class="col-md-6"><div class="progress"><div id="progress-bar-' + i + '" class="progress-bar progress-bar-warning" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div></div></div><div id="status-bar-' + i + '" class="col-md-6">Ожидание очереди...</div></div>'
+    var progressBarCode = '<div class="row progress-wrapper"><div class="col-md-6"><div class="progress"><div id="progress-bar-' + i + '" class="progress-bar progress-bar-warning" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div></div></div><div id="status-bar-' + i + '" class="col-md-6">Ожидание очереди...</div></div>'
     document.getElementById('file_upload_form').insertAdjacentHTML('beforeend', progressBarCode);
     ajaxQueue.push({file: files[i], position: i, params: imageHandleParams});
   }
@@ -126,8 +139,19 @@ function clearWidthAndHeight() {
   document.getElementById('resize-height').value = '';
 }
 
+function clearCurrentResults() {
+  imageLinks = [];
+  ajaxQueue = [];
+  activeAjaxes = 0;
+  document.getElementById('download-zip').classList.add('hidden');
+  document.querySelectorAll('.progress-wrapper').forEach(function(elem) {
+    elem.remove();
+  });
+}
+
 window.onload = function() {
   document.getElementById('file_select').addEventListener('change', function(event) {
+    clearCurrentResults();
     var totalSize = calculateTotalFileSize();
     checkUploadAbility(totalSize);
   }, false);
@@ -135,6 +159,7 @@ window.onload = function() {
   document.getElementById('upload-button').addEventListener('click', function(event) {
     event.preventDefault();
     document.getElementById('upload-button').classList.add('hidden');
+    disableAllInputs();
     startUpload();
   }, false);
 
