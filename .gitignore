@@ -1,3 +1,5 @@
 tmp
 log
 .byebug_history
+node_modules/
+public/script.js

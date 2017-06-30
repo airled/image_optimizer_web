@@ -1,0 +1,23 @@
+{
+  "name": "image_optimizer_web",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/airled/image_optimizer_web.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/airled/image_optimizer_web/issues"
+  },
+  "homepage": "https://github.com/airled/image_optimizer_web#readme",
+  "devDependencies": {
+    "uglifyjs-webpack-plugin": "^0.4.6",
+    "webpack": "^3.0.0"
+  }
+}
