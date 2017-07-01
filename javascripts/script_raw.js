@@ -11,7 +11,7 @@ function calculateTotalFileSize() {
     totalSize += files[i].size;
   }
   document.getElementById('sum-file-size').innerText = normalizeSize(totalSize);
-  document.getElementById('file-select-label').innerHTML = 'Выбрано файлов: ' + fileQuantity;
+  document.getElementById('file-select-label-text').innerHTML = 'Выбрано файлов: ' + fileQuantity;
   return totalSize / 1000;
 }
 
@@ -81,6 +81,7 @@ function sendFile(file, number, imageParams) {
         document.getElementById('upload-button').removeAttribute('disabled', 'disabled');
       }
     } else {
+      activeAjaxes--;
       progressbar.classList.remove('progress-bar-primary', 'progress-bar-striped', 'active');
       progressbar.classList.add('progress-bar-danger');
       progressbar.innerHTML = 'Ошибка';

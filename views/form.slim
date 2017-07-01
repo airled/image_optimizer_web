@@ -1,13 +1,16 @@
 html
   head
-    link href="styles.css" rel="stylesheet" /
     link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" /
+    script src="https://use.fontawesome.com/7bc7cf70b4.js"
+    link href="styles.css" rel="stylesheet" /
   body
     .wrapper
       form#file_upload_form action="/upload" enctype="multipart/form-data" method="post" 
         .row
           .col-md-12.form-group
-            label#file-select-label.btn.btn-warning.file-select-label for="file_select" Выбор файлов
+            label#file-select-label.btn.btn-warning.file-select-label for="file_select"
+              i> class="fa fa-list" aria-hidden="true"
+              span#file-select-label-text Выбор файлов
             input#file_select.form-control.file-select multiple="" name="images[]" type="file" /
         .row
           .col-md-6.form-group
@@ -37,9 +40,13 @@ html
         .form-group
           label> for="file_select" Общий размер (не более 25 MB):
           span#sum-file-size 0 kB
-      button#upload-button.btn.btn-primary.form-control.upload-button.hidden Сжать
+      button#upload-button.btn.btn-primary.form-control.upload-button.hidden
+        i> class="fa fa-compress" aria-hidden="true"
+        | Сжать
       hr
       form#download-zip.hidden action="/get_zip" method="post" 
         input#imageLinksInput name="links" type="hidden" value="" /
-        input.btn.btn-success.form-control type="submit" value=("Скачать архивом") /
+        button.btn.btn-success.form-control type="submit" value=("Скачать архивом")
+          i> class="fa fa-file-archive-o" aria-hidden="true"
+          | Скачать архивом
     script src="script.js" type="application/javascript" 
