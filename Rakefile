@@ -5,7 +5,7 @@ task :prepare do
 end
 
 task :run do
-  system('bundle exec thin -C config/thin.yml -R config.ru start')
+  system('bundle exec foreman s')
 end
 
 task :clean do

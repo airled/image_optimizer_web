@@ -3,36 +3,30 @@ var imageLinks = [];
 var ajaxQueue = [];
 var ajaxQueueStep = 1;
 
-function disableAllInputs() {
-  document.querySelectorAll('input').forEach(function(elem) {
-    elem.setAttribute('disabled', 'disabled');
-  });
-}
-
-function enableAllInputs() {
-  document.querySelectorAll('input').forEach(function(elem) {
-    elem.removeAttribute('disabled', 'disabled');
-  });
-}
-
 function calculateTotalFileSize() {
   var files = document.getElementById('file_select').files;
   var totalSize = 0;
-  var length = files.length;
-  for(var i = 0; i < files.length; i++) {
+  var fileQuantity = files.length;
+  for(var i = 0; i < fileQuantity; i++) {
     totalSize += files[i].size;
   }
   document.getElementById('sum-file-size').innerText = normalizeSize(totalSize);
+  document.getElementById('file-select-label').innerHTML = 'Выбрано файлов: ' + fileQuantity;
   return totalSize / 1000;
 }
 
 function checkUploadAbility(totalSize) {
   var button = document.getElementById('upload-button');
   var sizeLabel = document.getElementById('sum-file-size');
-  if (totalSize > 25000) {
+  var fileQuantity = document.getElementById('file_select').files.length;
+  if (totalSize > 25000 || totalSize <= 0) {
     button.classList.add('hidden');
     sizeLabel.classList.add('alerted');
+    document.getElementById('file-select-label').classList.remove('btn-warning', 'btn-success');
+    document.getElementById('file-select-label').classList.add('btn-danger');
   } else {
+    document.getElementById('file-select-label').classList.remove('btn-warning', 'btn-danger');
+    document.getElementById('file-select-label').classList.add('btn-success');
     button.classList.remove('hidden');
     sizeLabel.classList.remove('alerted');
   }
@@ -84,7 +78,6 @@ function sendFile(file, number, imageParams) {
         document.getElementById('imageLinksInput').value = JSON.stringify(imageLinks);
         document.getElementById('download-zip').classList.remove('hidden');
         document.getElementById('upload-button').classList.remove('hidden');
-        enableAllInputs();
         document.getElementById('upload-button').removeAttribute('disabled', 'disabled');
       }
     } else {
@@ -152,7 +145,7 @@ function clearCurrentResults() {
 }
 
 window.onload = function() {
-  document.getElementById('file_select').addEventListener('click', function(event) {
+  document.getElementById('file_select').addEventListener('change', function(event) {
     clearCurrentResults();
     var totalSize = calculateTotalFileSize();
     checkUploadAbility(totalSize);
@@ -162,7 +155,6 @@ window.onload = function() {
     event.preventDefault();
     clearCurrentResults();
     document.getElementById('upload-button').setAttribute('disabled', 'disabled');
-    disableAllInputs();
     startUpload();
   }, false);
 
