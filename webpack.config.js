@@ -1,5 +1,6 @@
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 var path = require('path');
+var LiveReloadPlugin = require('webpack-livereload-plugin');
 
 module.exports = {
   entry: './javascripts/script_raw.js',
@@ -8,6 +9,7 @@ module.exports = {
     path: path.resolve(__dirname, 'public')
   },
   plugins: [
-    new UglifyJSPlugin()
+    new UglifyJSPlugin(),
+    new LiveReloadPlugin()
   ]
 };

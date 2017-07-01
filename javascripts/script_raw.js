@@ -83,7 +83,9 @@ function sendFile(file, number, imageParams) {
       if (activeAjaxes == 0) {
         document.getElementById('imageLinksInput').value = JSON.stringify(imageLinks);
         document.getElementById('download-zip').classList.remove('hidden');
+        document.getElementById('upload-button').classList.remove('hidden');
         enableAllInputs();
+        document.getElementById('upload-button').removeAttribute('disabled', 'disabled');
       }
     } else {
       progressbar.classList.remove('progress-bar-primary', 'progress-bar-striped', 'active');
@@ -128,7 +130,7 @@ function startUpload() {
   for (var i = 0; i < files.length; ++i) {
     activeAjaxes++;
     var progressBarCode = '<div class="row progress-wrapper"><div class="col-md-6"><div class="progress"><div id="progress-bar-' + i + '" class="progress-bar progress-bar-warning" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div></div></div><div id="status-bar-' + i + '" class="col-md-6">Ожидание очереди...</div></div>'
-    document.getElementById('file_upload_form').insertAdjacentHTML('beforeend', progressBarCode);
+    document.getElementById('download-zip').insertAdjacentHTML('beforebegin', progressBarCode);
     ajaxQueue.push({file: files[i], position: i, params: imageHandleParams});
   }
   runNextFromAjaxQueue();
@@ -150,7 +152,7 @@ function clearCurrentResults() {
 }
 
 window.onload = function() {
-  document.getElementById('file_select').addEventListener('change', function(event) {
+  document.getElementById('file_select').addEventListener('click', function(event) {
     clearCurrentResults();
     var totalSize = calculateTotalFileSize();
     checkUploadAbility(totalSize);
@@ -158,12 +160,28 @@ window.onload = function() {
 
   document.getElementById('upload-button').addEventListener('click', function(event) {
     event.preventDefault();
-    document.getElementById('upload-button').classList.add('hidden');
+    clearCurrentResults();
+    document.getElementById('upload-button').setAttribute('disabled', 'disabled');
     disableAllInputs();
     startUpload();
   }, false);
 
   document.getElementById('change-size-no').addEventListener('click', function() {
     clearWidthAndHeight();
+  }, false);
+
+  document.getElementById('quality-range').addEventListener('input', function(event) {
+    var newValue = event.target.value;
+    document.getElementById('quality').value = newValue;
+  }, false);
+
+  document.getElementById('quality').addEventListener('keyup', function(event) {
+    var newValue = event.target.value;
+    document.getElementById('quality-range').value = newValue;
+  }, false);
+
+  document.getElementById('quality').addEventListener('change', function(event) {
+    var newValue = event.target.value;
+    document.getElementById('quality-range').value = newValue;
   }, false);
 }

@@ -2,15 +2,19 @@ html
   head
     link href="styles.css" rel="stylesheet" /
     link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" /
+    script src="http://localhost:35729/livereload.js"
   body
     .wrapper
       form#file_upload_form action="/upload" enctype="multipart/form-data" method="post" 
         .row
-          .col-md-6.form-group
-            label for="file_select"  Выбор файлов
+          .col-md-12.form-group
+            label for="file_select" Выбор файлов
             input#file_select.form-control multiple="" name="images[]" type="file" /
+        .row
           .col-md-6.form-group
-            label for="quality"  Качество JPG
+            label for="quality" Качество JPG
+            input#quality-range type="range" min="0" max="100" step="5" value="80" 
+          .col-md-6.form-group
             input#quality.form-control max="100" min="1" name="quality" type="number" value="80" /
         .row
           .col-md-6
@@ -34,8 +38,8 @@ html
         .form-group
           label> for="file_select" Общий размер (не более 25 MB):
           span#sum-file-size 0 kB
-      button#upload-button.btn.btn-primary.form-control Сжать
-      button#cancel-button.btn.btn-danger.form-control.hidden Остановить
+      button#upload-button.btn.btn-primary.form-control.upload-button Сжать
+      hr
       form#download-zip.hidden action="/get_zip" method="post" 
         input#imageLinksInput name="links" type="hidden" value="" /
         input.btn.btn-success.form-control type="submit" value=("Скачать архивом") /
