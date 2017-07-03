@@ -1,5 +1,5 @@
-threads 2,2
-workers 2
+threads 2,4
+workers 1
 daemonize false
 preload_app!
 

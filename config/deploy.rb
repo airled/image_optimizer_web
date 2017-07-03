@@ -10,7 +10,7 @@ set :deploy_to, '/home/optimizer/app'
 set :repository, 'git@github.com:airled/image_optimizer_web.git'
 set :branch, 'master'
 set :user, 'optimizer'
-set :shared_dirs, fetch(:shared_dirs, []).push('public', 'node_modules', 'tmp', 'log')
+set :shared_dirs, fetch(:shared_dirs, []).push('public/downloads', 'node_modules', 'tmp', 'log')
 # set :shared_files, fetch(:shared_files, []).push('config/database.yml', 'config/secrets.yml')
 
 task :environment do
