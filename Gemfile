@@ -10,5 +10,7 @@ gem 'puma'
 gem 'foreman'
 
 group :development do
+  gem 'mina'
+  gem 'mina-puma', :require => false
   gem 'byebug'
 end

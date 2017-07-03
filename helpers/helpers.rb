@@ -1,7 +1,6 @@
 require 'zip'
 require 'mini_magick'
 require 'image_optimizer'
-require 'byebug'
 
 module Helpers
   KEEP_FOLDER_PATH = File.expand_path('../../public/downloads/', __FILE__).freeze
