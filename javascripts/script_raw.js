@@ -15,6 +15,13 @@ function calculateTotalFileSize() {
   return totalSize / 1000;
 }
 
+function reduceFilename(name) {
+  if (name.length > 28) {
+    return (name.slice(0, 13) + '...' + name.slice(-13, name.length));
+  }
+  return name;
+}
+
 function checkUploadAbility(totalSize) {
   var button = document.getElementById('upload-button');
   var sizeLabel = document.getElementById('sum-file-size');
@@ -49,14 +56,14 @@ function sendFile(file, number, imageParams) {
   var xhr = new XMLHttpRequest();
   xhr.open('POST', '/upload', true);
   var progressbar = document.getElementById('progress-bar-' + number);
-  var statusbar = document.getElementById('status-bar-' + number);
+  var statusText = document.getElementById('status-text-' + number);
   xhr.upload.onprogress = function(event) {
     var loadedKb = Math.floor(event.loaded / 1000);
     var totalKb = Math.floor(event.total / 1000);
     var percentage = Math.floor((loadedKb / totalKb) * 100);
     progressbar.style.width = percentage + '%';
     progressbar.innerText = percentage + '%';
-    statusbar.innerHTML = file.name + ' | ' + loadedKb + '/' + totalKb;
+    statusText.innerHTML = loadedKb + '/' + totalKb;
   }
   xhr.upload.onerror = function() {
     progressbar.innerHTML = 'Ошибка';
@@ -123,7 +130,7 @@ function startUpload() {
   }
   for (var i = 0; i < files.length; ++i) {
     activeAjaxes++;
-    var progressBarCode = '<div class="row progress-wrapper"><div class="col-md-6"><div class="progress"><div id="progress-bar-' + i + '" class="progress-bar progress-bar-warning" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div></div></div><div id="status-bar-' + i + '" class="col-md-6">Ожидание очереди...</div></div>'
+    var progressBarCode = '<div class="row progress-wrapper"><div class="col-xs-5" id="status-bar-' + i + '" title="' + files[i].name + '">' + reduceFilename(files[i].name) + '</div><div class="col-xs-2" id="status-text-' + i + '">В очереди</div><div class="col-xs-5"><div class="progress"><div id="progress-bar-' + i + '" class="progress-bar progress-bar-warning" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div></div></div></div>'
     document.getElementById('download-zip').insertAdjacentHTML('beforebegin', progressBarCode);
     ajaxQueue.push({file: files[i], position: i, params: imageHandleParams});
   }
