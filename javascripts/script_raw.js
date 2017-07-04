@@ -17,7 +17,7 @@ function calculateTotalFileSize() {
 
 function reduceFilename(name) {
   if (name.length > 28) {
-    return (name.slice(0, 13) + '...' + name.slice(-13, name.length));
+    return (name.slice(0, 13) + '...' + name.slice(-13));
   }
   return name;
 }
