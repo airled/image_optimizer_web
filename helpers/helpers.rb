@@ -6,13 +6,15 @@ module Helpers
   KEEP_FOLDER_PATH = File.expand_path('../../public/downloads/', __FILE__).freeze
   JPG_SIGNATURE = [255, 216, 255]
   PNG_SIGNATURE = [137, 80, 78]
+  GIF_SIGNATURE = [71, 73, 70]
 
   class Determiner
     def self.image?(params)
       return false unless params.dig(:file, :tempfile)
       signature = params[:file][:tempfile].read(3).bytes
       (signature == JPG_SIGNATURE && params[:file][:filename].match(/.+\.jpe?g\z/i)) ||
-      (signature == PNG_SIGNATURE && params[:file][:filename].match(/.+\.png\z/i))
+      (signature == PNG_SIGNATURE && params[:file][:filename].match(/.+\.png\z/i)) ||
+      (signature == GIF_SIGNATURE && params[:file][:filename].match(/.+\.gif\z/i))
     end
   end
 
