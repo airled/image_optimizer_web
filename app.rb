@@ -2,6 +2,7 @@ require 'sinatra'
 require 'securerandom'
 require 'json'
 require_relative './helpers/helpers'
+require 'uri'
 
 set :server, :puma
 
@@ -19,7 +20,7 @@ post '/upload' do
   Helpers::Optimizer.new(params).optimize_all_in_dir(dirname)
   diff = comparator.compare(dirname)
   content_type :json
-  {link: "/downloads/#{dirname}/#{params[:file][:filename]}", diff: diff}.to_json
+  {link: URI.escape("/downloads/#{dirname}/#{params[:file][:filename]}"), diff: diff}.to_json
 end
 
 post '/get_zip' do
