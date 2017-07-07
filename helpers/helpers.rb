@@ -29,6 +29,7 @@ module Helpers
       File.open("#{KEEP_FOLDER_PATH}/#{dir_name}/#{@file_name}", 'wb') do |file|
         file << File.read(@temp_file)
       end
+      @file_name
     end
   end
 
@@ -67,12 +68,12 @@ module Helpers
     end
   end
 
-  class Ziper
+  class Zipper
     def zip_from(links)
       zip_path = "#{KEEP_FOLDER_PATH}/#{SecureRandom.hex}.zip"
       Zip::File.open(zip_path, Zip::File::CREATE) do |zipfile|
         links.each do |link|
-          image_path = link.gsub('/downloads/', '')
+          image_path = Addressable::URI.unescape(link).gsub('/downloads/', '')
           zipfile.add(image_path.split('/').last, "#{KEEP_FOLDER_PATH}/#{image_path}")
         end
       end

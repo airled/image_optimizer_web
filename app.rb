@@ -2,7 +2,7 @@ require 'sinatra'
 require 'securerandom'
 require 'json'
 require_relative './helpers/helpers'
-require 'uri'
+require 'addressable'
 
 set :server, :puma
 
@@ -16,11 +16,14 @@ post '/upload' do
   halt 400 unless Helpers::Determiner.image?(params)
   dirname = "#{Time.now.to_i}-#{SecureRandom.uuid}"
   comparator = Helpers::Comparator.new(params)
-  Helpers::Carrier.new(params).save(dirname)
+  filename = Helpers::Carrier.new(params).save(dirname)
   Helpers::Optimizer.new(params).optimize_all_in_dir(dirname)
   diff = comparator.compare(dirname)
   content_type :json
-  {link: URI.escape("/downloads/#{dirname}/#{params[:file][:filename]}"), diff: diff}.to_json
+  {
+    link: "/downloads/#{dirname}/#{Addressable::URI.escape(filename)}",
+    diff: diff
+  }.to_json
 end
 
 post '/get_zip' do
@@ -31,7 +34,7 @@ post '/get_zip' do
   rescue
     halt 400
   end
-  zip = Helpers::Ziper.new.zip_from(links)
+  zip = Helpers::Zipper.new.zip_from(links)
   send_file zip
 end
 

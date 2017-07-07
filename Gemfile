@@ -8,6 +8,7 @@ gem 'rake'
 gem 'slim'
 gem 'puma'
 gem 'foreman'
+gem 'addressable'
 
 group :development do
   gem 'mina'
