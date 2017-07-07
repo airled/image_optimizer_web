@@ -1,8 +1,8 @@
 require 'sinatra'
 require 'securerandom'
 require 'json'
-require_relative './helpers/helpers'
 require 'addressable'
+require_relative './helpers/helpers'
 
 set :server, :puma
 

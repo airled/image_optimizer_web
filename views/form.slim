@@ -14,6 +14,9 @@ html
               i> class="fa fa-list" aria-hidden="true"
               span#file-select-label-text Выбор файлов (jpg, png, gif)
             input#file_select.form-control.file-select multiple="" name="images[]" type="file" /
+        .form-group
+          label> for="file_select" Общий размер (не более 25 MB):
+          span#sum-file-size 0 kB
         .row
           .col-md-6.form-group
             label for="quality" Качество JPG
@@ -39,9 +42,6 @@ html
             input#resize-width.form-control name="width" placeholder="Ширина" type="number" /
             label for="resize-height" Высота
             input#resize-height.form-control name="height" placeholder="Высота" type="number" /
-        .form-group
-          label> for="file_select" Общий размер (не более 25 MB):
-          span#sum-file-size 0 kB
       button#upload-button.btn.btn-primary.form-control.upload-button.hidden
         i> class="fa fa-compress" aria-hidden="true"
         | Сжать

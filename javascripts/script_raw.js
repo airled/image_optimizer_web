@@ -1,7 +1,9 @@
-var activeAjaxes = 0;
 var imageLinks = [];
 var ajaxQueue = [];
 var ajaxQueueStep = 1;
+
+var fileSelectLabel = document.getElementById('file-select-label');
+var uploadButton = document.getElementById('upload-button');
 
 function calculateTotalFileSize() {
   var files = document.getElementById('file_select').files;
@@ -23,18 +25,17 @@ function reduceFilename(name) {
 }
 
 function checkUploadAbility(totalSize) {
-  var button = document.getElementById('upload-button');
   var sizeLabel = document.getElementById('sum-file-size');
   var fileQuantity = document.getElementById('file_select').files.length;
   if (totalSize > 25000 || totalSize <= 0) {
-    button.classList.add('hidden');
+    uploadButton.classList.add('hidden');
     sizeLabel.classList.add('alerted');
-    document.getElementById('file-select-label').classList.remove('btn-warning', 'btn-success');
-    document.getElementById('file-select-label').classList.add('btn-danger');
+    fileSelectLabel.classList.remove('btn-warning', 'btn-success');
+    fileSelectLabel.classList.add('btn-danger');
   } else {
-    document.getElementById('file-select-label').classList.remove('btn-warning', 'btn-danger');
-    document.getElementById('file-select-label').classList.add('btn-success');
-    button.classList.remove('hidden');
+    fileSelectLabel.classList.remove('btn-warning', 'btn-danger');
+    fileSelectLabel.classList.add('btn-success');
+    uploadButton.classList.remove('hidden');
     sizeLabel.classList.remove('alerted');
   }
 }
@@ -45,6 +46,13 @@ function normalizeSize(byteSize) {
     return Math.floor(size / 1000) + ' MB';
   }
   return size + ' kB';
+}
+
+function buildImageLink(response) {
+  return '<a target="_blank" href= ' + response.link +
+         ' style="display: block; width: 100%; color: white;">Скачать (' +
+         response.diff +
+         '%)</a>'
 }
 
 function sendFile(file, number, imageParams) {
@@ -63,7 +71,7 @@ function sendFile(file, number, imageParams) {
     var percentage = Math.floor((loadedKb / totalKb) * 100);
     progressbar.style.width = percentage + '%';
     progressbar.innerText = percentage + '%';
-    statusText.innerHTML = loadedKb + '/' + totalKb;
+    statusText.innerHTML = loadedKb + '/' + totalKb + ' Kb';
   }
   xhr.upload.onerror = function() {
     progressbar.innerHTML = 'Ошибка';
@@ -78,22 +86,21 @@ function sendFile(file, number, imageParams) {
       response = JSON.parse(xhr.responseText);
       progressbar.classList.remove('progress-bar-primary', 'progress-bar-striped', 'active');
       progressbar.classList.add('progress-bar-success');
-      progressbar.innerHTML = '<a target="_blank" href= ' + response.link + ' style="width: 100%; color: white;">Скачать (' + response.diff + '%)' + '</a>';
-      activeAjaxes--;
+      progressbar.innerHTML = buildImageLink(response);
       imageLinks.push(response.link);
-      if (activeAjaxes == 0) {
-        document.getElementById('imageLinksInput').value = JSON.stringify(imageLinks);
-        document.getElementById('download-zip').classList.remove('hidden');
-        document.getElementById('upload-button').classList.remove('hidden');
-        document.getElementById('upload-button').removeAttribute('disabled', 'disabled');
-      }
     } else {
-      activeAjaxes--;
       progressbar.classList.remove('progress-bar-primary', 'progress-bar-striped', 'active');
       progressbar.classList.add('progress-bar-danger');
       progressbar.innerHTML = 'Ошибка';
     }
-    runNextFromAjaxQueue();
+    if (ajaxQueue.length == 0) {
+      document.getElementById('imageLinksInput').value = JSON.stringify(imageLinks);
+      document.getElementById('download-zip').classList.remove('hidden');
+      uploadButton.classList.remove('hidden');
+      uploadButton.removeAttribute('disabled', 'disabled');
+    } else {
+      runNextFromAjaxQueue();
+    }
   }
   xhr.send(formData);
 }
@@ -129,8 +136,8 @@ function startUpload() {
     height:  document.getElementById('resize-height').value
   }
   for (var i = 0; i < files.length; ++i) {
-    activeAjaxes++;
-    var progressBarCode = '<div class="row progress-wrapper"><div class="col-xs-5" id="status-bar-' + i + '" title="' + files[i].name + '">' + reduceFilename(files[i].name) + '</div><div class="col-xs-2" id="status-text-' + i + '">В очереди</div><div class="col-xs-5"><div class="progress"><div id="progress-bar-' + i + '" class="progress-bar progress-bar-warning" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div></div></div></div>'
+    var progressBarCode =
+      '<div class="row progress-wrapper"><div class="col-xs-4" id="status-bar-' + i + '" title="' + files[i].name + '">' + reduceFilename(files[i].name) + '</div><div class="col-xs-3" id="status-text-' + i + '">В очереди</div><div class="col-xs-5"><div class="progress"><div id="progress-bar-' + i + '" class="progress-bar progress-bar-warning" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div></div></div></div>'
     document.getElementById('download-zip').insertAdjacentHTML('beforebegin', progressBarCode);
     ajaxQueue.push({file: files[i], position: i, params: imageHandleParams});
   }
@@ -145,7 +152,6 @@ function clearWidthAndHeight() {
 function clearCurrentResults() {
   imageLinks = [];
   ajaxQueue = [];
-  activeAjaxes = 0;
   document.getElementById('download-zip').classList.add('hidden');
   document.querySelectorAll('.progress-wrapper').forEach(function(elem) {
     elem.remove();
@@ -159,10 +165,10 @@ window.onload = function() {
     checkUploadAbility(totalSize);
   }, false);
 
-  document.getElementById('upload-button').addEventListener('click', function(event) {
+  uploadButton.addEventListener('click', function(event) {
     event.preventDefault();
     clearCurrentResults();
-    document.getElementById('upload-button').setAttribute('disabled', 'disabled');
+    uploadButton.setAttribute('disabled', 'disabled');
     startUpload();
   }, false);
 
