@@ -9,9 +9,11 @@ gem 'slim'
 gem 'puma'
 gem 'foreman'
 gem 'addressable'
+gem 'whenever', require: false
 
 group :development do
   gem 'mina'
+  gem 'mina-whenever'
   gem 'mina-puma', :require => false
   gem 'byebug'
 end

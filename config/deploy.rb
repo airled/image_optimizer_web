@@ -3,6 +3,7 @@ require 'mina/git'
 require 'mina/bundler'
 require 'mina/rbenv'
 require 'mina/puma'
+require 'mina/whenever'
 
 set :application_name, 'image_iptimizer_web'
 set :domain, '88.99.226.18'
@@ -40,6 +41,7 @@ task :deploy do
       invoke :'npm_install'
       invoke :'asset_compile'
       invoke :'puma:phased_restart'
+      invoke :'whenever:update'
     end
   end
 end
