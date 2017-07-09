@@ -37,11 +37,22 @@ html
               label
                 input#change-size-fill name="resize" type="radio" value="fill" /
                 | Заполнить
-          .col-md-6.form-group
-            label for="resize-width" Ширина
-            input#resize-width.form-control name="width" placeholder="Ширина" type="number" /
-            label for="resize-height" Высота
-            input#resize-height.form-control name="height" placeholder="Высота" type="number" /
+            .radio
+              label
+                input#change-size-scale name="resize" type="radio" value="scale" /
+                | Масштабировать
+          .col-md-6.top-padding
+            .form-group.hidden#pixel-inputs
+              p
+                input#resize-width.form-control name="width" placeholder="Ширина" type="number" /
+              p
+                input#resize-height.form-control name="height" placeholder="Высота" type="number" /
+            .form-group.hidden#percent-input
+              select.form-control#resize-scale name="scale"
+                - (10..90).step(10).each do |step|
+                  option value=step
+                    = step
+                    | %
       button#upload-button.btn.btn-primary.form-control.upload-button.hidden
         i> class="fa fa-compress" aria-hidden="true"
         | Сжать

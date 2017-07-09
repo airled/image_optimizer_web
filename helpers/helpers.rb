@@ -36,9 +36,10 @@ module Helpers
   class Optimizer
     def initialize(params)
       @quality = params[:quality].to_s.empty? ? 80 : params[:quality].to_i
-      @width = params[:width].to_s.strip
-      @height = params[:height].to_s.strip
-      @resize = params[:resize]
+      @width   = params[:width].to_s.strip
+      @height  = params[:height].to_s.strip
+      @scale   = params[:scale].to_s.strip
+      @resize  = params[:resize]
     end
 
     def optimize_all_in_dir(dir_name)
@@ -61,6 +62,12 @@ module Helpers
             resizing = scale_x > scale_y ? "#{scale_x * image.width}" : "x#{scale_y * image.height}"
             image.resize(resizing)
             image.crop("#{@width}x#{@height}+0+0")
+          end
+        when 'scale'
+          image = MiniMagick::Image.new(full_path)
+          unless @scale.empty?
+            new_width = image.width * @scale.to_i / 100
+            MiniMagick::Image.new(full_path).resize("#{new_width}")
           end
         end
         ImageOptimizer.new(full_path, quality: @quality, quiet: true, level: 3).optimize
@@ -89,7 +96,12 @@ module Helpers
 
     def compare(dirname)
       new_file_size = File.size("#{KEEP_FOLDER_PATH}/#{dirname}/#{@filename}")
-      (new_file_size - @old_file_size) * 100 / @old_file_size
+      percent = ((new_file_size - @old_file_size) * 100 / @old_file_size)
+      if percent.positive?
+        {percent: "+#{percent}", color: 'warning'}
+      else
+        {percent: percent.to_s, color: 'success'}
+      end
     end
   end
 end

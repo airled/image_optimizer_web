@@ -19,11 +19,9 @@ post '/upload' do
   filename = Helpers::Carrier.new(params).save(dirname)
   Helpers::Optimizer.new(params).optimize_all_in_dir(dirname)
   diff = comparator.compare(dirname)
+  diff.merge!(link: "/downloads/#{dirname}/#{Addressable::URI.escape(filename)}")
   content_type :json
-  {
-    link: "/downloads/#{dirname}/#{Addressable::URI.escape(filename)}",
-    diff: diff
-  }.to_json
+  diff.to_json
 end
 
 post '/get_zip' do

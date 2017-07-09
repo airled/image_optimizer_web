@@ -51,7 +51,7 @@ function normalizeSize(byteSize) {
 function buildImageLink(response) {
   return '<a target="_blank" href= ' + response.link +
          ' style="display: block; width: 100%; color: white;">Скачать (' +
-         response.diff +
+         response.percent +
          '%)</a>'
 }
 
@@ -85,7 +85,7 @@ function sendFile(file, number, imageParams) {
     if (xhr.status === 200) {
       response = JSON.parse(xhr.responseText);
       progressbar.classList.remove('progress-bar-primary', 'progress-bar-striped', 'active');
-      progressbar.classList.add('progress-bar-success');
+      progressbar.classList.add('progress-bar-' + response.color);
       progressbar.innerHTML = buildImageLink(response);
       imageLinks.push(response.link);
     } else {
@@ -133,7 +133,8 @@ function startUpload() {
     quality: document.getElementById('quality').value,
     resize:  determineResizeType(),
     width:   document.getElementById('resize-width').value,
-    height:  document.getElementById('resize-height').value
+    height:  document.getElementById('resize-height').value,
+    scale:   document.getElementById('resize-scale').value
   }
   for (var i = 0; i < files.length; ++i) {
     var progressBarCode =
@@ -174,7 +175,25 @@ window.onload = function() {
 
   document.getElementById('change-size-no').addEventListener('click', function() {
     clearWidthAndHeight();
+    document.getElementById('pixel-inputs').classList.add('hidden');
+    document.getElementById('percent-input').classList.add('hidden');
   }, false);
+
+  document.getElementById('change-size-fit').addEventListener('click', function() {
+    document.getElementById('percent-input').classList.add('hidden');
+    document.getElementById('pixel-inputs').classList.remove('hidden');
+  }, false);
+
+  document.getElementById('change-size-fill').addEventListener('click', function() {
+    document.getElementById('percent-input').classList.add('hidden');
+    document.getElementById('pixel-inputs').classList.remove('hidden');
+  }, false);
+
+  document.getElementById('change-size-scale').addEventListener('click', function() {
+    clearWidthAndHeight();
+    document.getElementById('pixel-inputs').classList.add('hidden');
+    document.getElementById('percent-input').classList.remove('hidden');
+  });
 
   document.getElementById('quality-range').addEventListener('input', function(event) {
     var newValue = event.target.value;
@@ -190,4 +209,5 @@ window.onload = function() {
     var newValue = event.target.value;
     document.getElementById('quality-range').value = newValue;
   }, false);
+
 }
