@@ -1,5 +1,6 @@
 require 'zip'
 require 'addressable'
+require 'securerandom'
 require_relative './constants'
 
 module Helpers

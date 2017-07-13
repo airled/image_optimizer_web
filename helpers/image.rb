@@ -1,3 +1,4 @@
+require 'securerandom'
 require 'mini_magick'
 require 'image_optimizer'
 require 'addressable'
@@ -39,37 +40,45 @@ class Image
 
   def optimize!
     case @resize
-    when 'fit'
-      image = MiniMagick::Image.new(@path)
-      unless (@width == '' && @height == '') || (@width == image.width.to_s && @height == image.height.to_s)
-        new_width = @width.empty? ? image.width : @width
-        new_height = @height.empty? ? image.height : @height
-        MiniMagick::Image.new(@path).resize("#{new_width}x#{new_height}")
-      end
-    when 'fill'
-      image = MiniMagick::Image.new(@path)
-      unless (@width == '' && @height == '') || (@width == image.width.to_s && @height == image.height.to_s)
-        scale_x = @width.to_i / image.width.to_f
-        scale_y = @height.to_i / image.height.to_f
-        resizing = scale_x > scale_y ? "#{scale_x * image.width}" : "x#{scale_y * image.height}"
-        image.resize(resizing)
-        image.crop("#{@width}x#{@height}+0+0")
-      end
-    when 'scale'
-      image = MiniMagick::Image.new(@path)
-      unless @scale.empty?
-        new_width = image.width * @scale.to_i / 100
-        MiniMagick::Image.new(@path).resize(new_width.to_s)
-      end
+    when 'fit'   then fit_image
+    when 'fill'  then fill_image
+    when 'scale' then scale_image
     end
     ImageOptimizer.new(@path, quality: @quality, quiet: true, level: 3).optimize
-    calculate_pecentage
+    calculate_percentage
     true
   end
 
   private
 
-  def calculate_pecentage
+  def fit_image
+    image = MiniMagick::Image.new(@path)
+    return if (@width == '' && @height == '') ||
+              (@width.to_i == image.width && @height.to_i == image.height)
+    new_width = @width.empty? ? image.width : @width
+    new_height = @height.empty? ? image.height : @height
+    image.resize("#{new_width}x#{new_height}")
+  end
+
+  def fill_image
+    image = MiniMagick::Image.new(@path)
+    return if (@width == '' && @height == '') ||
+              (@width.to_i == image.width && @height.to_i == image.height)
+    scale_x = @width.to_i / image.width.to_f
+    scale_y = @height.to_i / image.height.to_f
+    resizing = scale_x > scale_y ? "#{scale_x * image.width}" : "x#{scale_y * image.height}"
+    image.resize(resizing)
+    image.crop("#{@width}x#{@height}+0+0")
+  end
+
+  def scale_image
+    image = MiniMagick::Image.new(@path)
+    return if @scale.empty?
+    new_width = image.width * @scale.to_i / 100
+    image.resize(new_width.to_s)
+  end
+
+  def calculate_percentage
     percent = (get_current_size - @old_size) * 100 / @old_size
     @percentage =
       if percent.positive?

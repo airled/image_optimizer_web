@@ -1,5 +1,4 @@
 require 'sinatra'
-require 'securerandom'
 require 'json'
 require_relative './helpers/helpers'
 require_relative './helpers/image'
