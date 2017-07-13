@@ -1,8 +1,8 @@
 require 'sinatra'
 require 'securerandom'
 require 'json'
-require 'addressable'
 require_relative './helpers/helpers'
+require_relative './helpers/image'
 
 set :server, :puma
 
@@ -13,15 +13,12 @@ get '/' do
 end
 
 post '/upload' do
-  halt 400 unless Helpers::Determiner.image?(params)
-  dirname = "#{Time.now.to_i}-#{SecureRandom.uuid}"
-  comparator = Helpers::Comparator.new(params)
-  filename = Helpers::Carrier.new(params).save(dirname)
-  Helpers::Optimizer.new(params).optimize_all_in_dir(dirname)
-  diff = comparator.compare(dirname)
-  diff.merge!(link: "/downloads/#{dirname}/#{Addressable::URI.escape(filename)}")
+  image = Image.new(params)
+  halt 400 unless image.image?
+  image.save
+  image.optimize!
   content_type :json
-  diff.to_json
+  image.percentage.merge!(link: image.url).to_json
 end
 
 post '/get_zip' do
@@ -32,7 +29,6 @@ post '/get_zip' do
   rescue
     halt 400
   end
-  zip = Helpers::Zipper.new.zip_from(links)
+  zip = Helpers::Zipper.zip_from(links)
   send_file zip
 end
-
