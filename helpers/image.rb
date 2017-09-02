@@ -79,16 +79,13 @@ class Image
   end
 
   def calculate_percentage
-    percent = (get_current_size - @old_size) * 100 / @old_size
+    new_size = File.size(@path)
+    percent = (new_size - @old_size) * 100 / @old_size
     @percentage =
       if percent.positive?
-        {percent: "+#{percent}", color: 'warning'}
+        {new_size: new_size, percent: "+#{percent}", color: 'warning'}
       else
-        {percent: percent.to_s, color: 'success'}
+        {new_size: new_size, percent: percent.to_s, color: 'success'}
       end
-  end
-
-  def get_current_size
-    File.size(@path)
   end
 end

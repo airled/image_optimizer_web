@@ -51,6 +51,8 @@ function normalizeSize(byteSize) {
 function buildImageLink(response) {
   return '<a target="_blank" href= ' + response.link +
          ' style="display: block; width: 100%; color: white;">Скачать (' +
+         normalizeSize(response.new_size) +
+         ', ' +
          response.percent +
          '%)</a>'
 }
